@@ -15,17 +15,16 @@ DS1307 rtc;
 void setup() {
 
     Serial.begin(115200);
-
-    pinMode(8, OUTPUT);
-    digitalWrite(8, HIGH);
-    delay(1000);
-    digitalWrite(8, LOW);
+    delay(2000);
 
     // RTC initialization
     //Serial.println("===== Setup =====");
     // check if we already have an ID or not
-    /*if ( EEPROM.read(0) == 0 || EEPROM.read(1) == 0 ) {
-        Serial.print("Enter a location ID (max. 4096): ");
+    // for testing, we will always let user input id for now
+    if ( EEPROM.read(0) == 0 || EEPROM.read(1) == 0 ) {
+
+        Serial.println("NO_ID");
+
         int id = -1;
         while(id == -1) {
             if (Serial.available() > 0) {
@@ -34,13 +33,17 @@ void setup() {
         }
         char base64Id[2];
         convertNumber(base64Id, id, 0, 2);
+        //Serial.print(base64Id[0]);
+    //    Serial.println(base64Id[1]);
         EEPROM.write(0, base64Id[0]);
         EEPROM.write(1, base64Id[1]);
+    } else {
+        Serial.println("YES_ID");
     }
 
-    Serial.print("ID:");
-    Serial.print(EEPROM.read(0));
-    Serial.println(EEPROM.read(1));*/
+    Serial.print("ID (base 64): ");
+    Serial.print((char)EEPROM.read(0));
+    Serial.println((char)EEPROM.read(1));
 
     //Serial.println("Initializing RTC...");
     //Serial.println("===== Enter an initialization time ===== ");
@@ -51,11 +54,9 @@ void setup() {
         if (Serial.available() > 0) {
             startYear = Serial.parseInt();
             Serial.println(startYear);
-            digitalWrite(8, HIGH);
         }
     }
 
-    digitalWrite(8, LOW);
 
     int startMonth = -1;
     //Serial.print("Month:");
@@ -63,11 +64,9 @@ void setup() {
         if (Serial.available() > 0) {
             startMonth = Serial.parseInt();
             Serial.println(startMonth);
-            digitalWrite(8, HIGH);
         }
     }
 
-    digitalWrite(8, LOW);
 
     int startDay = -1;
     //Serial.print("Day:");
@@ -75,12 +74,10 @@ void setup() {
         if (Serial.available() > 0) {
             startDay = Serial.parseInt();
             Serial.println(startDay);
-            digitalWrite(8, HIGH);
 
         }
     }
 
-    digitalWrite(8, LOW);
 
     int startHour = -1;
     //Serial.print("Hour:");
@@ -88,11 +85,9 @@ void setup() {
         if (Serial.available() > 0) {
             startHour = Serial.parseInt();
             Serial.println(startHour);
-            digitalWrite(8, HIGH);
         }
     }
 
-    digitalWrite(8, LOW);
 
     int startMinute = -1;
     //Serial.print("Minute:");
@@ -100,11 +95,9 @@ void setup() {
         if (Serial.available() > 0) {
             startMinute = Serial.parseInt();
             Serial.println(startMinute);
-            digitalWrite(8, HIGH);
         }
     }
 
-    digitalWrite(8, LOW);
 
     int startSec = -1;
     //Serial.print("Second:");
@@ -112,7 +105,6 @@ void setup() {
         if (Serial.available() > 0) {
             startSec = Serial.parseInt();
             Serial.println(startSec);
-            digitalWrite(8, HIGH);
         }
     }
 
