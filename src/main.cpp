@@ -6,25 +6,59 @@
 //#include <RH_RF95.h>
 
 #include <Wire.h>
-#include <DS1307.h>
 
 #include <Base64.hpp>
 
-DS1307 rtc;
+#include <LiquidCrystal.h>
+#define LCD_LIGHT_PIN A3
+
+LiquidCrystal lcd(14, 15, 9, 10, 5, 16);
 
 void setup() {
 
     Serial.begin(115200);
+    lcd.begin(16, 2);
+    lcd.setCursor(0,0);
+    lcd.clear();
     delay(2000);
 
     // RTC initialization
     //Serial.println("===== Setup =====");
     // check if we already have an ID or not
     // for testing, we will always let user input id for now
+    lcd.print(EEPROM.read(0));
+    lcd.setCursor(1,0);
+    lcd.print(EEPROM.read(1));
+    lcd.setCursor(0,1);
     if ( EEPROM.read(0) == 0 || EEPROM.read(1) == 0 ) {
 
         Serial.println("NO_ID");
+        lcd.print("NO_ID");
 
+    } else {
+        Serial.println("YES_ID");
+        lcd.print("YES_ID");
+    }
+
+    bool expectId = NULL;
+    while(expectId == NULL) {
+        if (Serial.available() > 0) {
+            int code = Serial.parseInt();
+            if (code == 1) {
+                expectId = true;
+            } else if (code == 0) {
+                expectId = false;
+            }
+        }
+    }
+
+    lcd.clear();
+
+    lcd.print("Expect ID:");
+    lcd.setCursor(10,0);
+    lcd.print(expectId);
+
+    if (expectId == true) {
         int id = -1;
         while(id == -1) {
             if (Serial.available() > 0) {
@@ -34,11 +68,9 @@ void setup() {
         char base64Id[2];
         convertNumber(base64Id, id, 0, 2);
         //Serial.print(base64Id[0]);
-    //    Serial.println(base64Id[1]);
+        //    Serial.println(base64Id[1]);
         EEPROM.write(0, base64Id[0]);
         EEPROM.write(1, base64Id[1]);
-    } else {
-        Serial.println("YES_ID");
     }
 
     Serial.print("ID (base 64): ");
@@ -108,37 +140,7 @@ void setup() {
         }
     }
 
-    digitalWrite(8, LOW);
-
-    rtc.set(
-		startSec,
-		startMinute,
-		startHour,
-		startDay,
-		startMonth,
-		startYear
-	); //08:00:00 24.12.2014 //sec, min, hour, day, month, year
-
-	rtc.start();
-
-    uint8_t sec, min, hour, day, month;
-  	uint16_t year;
-	rtc.get(&sec, &min, &hour, &day, &month, &year);
-
-    Serial.print("Set time: ");
-    Serial.print(hour, DEC);
-    Serial.print(":");
-    Serial.print(min, DEC);
-    Serial.print(":");
-    Serial.print(sec, DEC);
-
-	Serial.print(" ");
-
-	Serial.print(day, DEC);
-	Serial.print(".");
-	Serial.print(month, DEC);
-	Serial.print(".");
-	Serial.println(year, DEC);
+    digitalWrite(8, LOW); // why?
 }
 
 void loop() {
